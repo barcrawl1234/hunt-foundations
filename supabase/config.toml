@@ -1,1 +1,4 @@
 project_id = "jqebgxcvlttgyexcmklr"
+
+[functions.generate-hunt-story]
+verify_jwt = true

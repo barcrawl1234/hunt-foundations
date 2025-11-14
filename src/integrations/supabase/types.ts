@@ -104,6 +104,56 @@ export type Database = {
           },
         ]
       }
+      hunt_stories: {
+        Row: {
+          created_at: string
+          final_madlib_template: string | null
+          final_passphrase: string | null
+          hunt_id: string
+          id: string
+          intro_scene_1: string | null
+          intro_scene_2: string | null
+          intro_scene_3: string | null
+          theme: string | null
+          tone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          final_madlib_template?: string | null
+          final_passphrase?: string | null
+          hunt_id: string
+          id?: string
+          intro_scene_1?: string | null
+          intro_scene_2?: string | null
+          intro_scene_3?: string | null
+          theme?: string | null
+          tone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          final_madlib_template?: string | null
+          final_passphrase?: string | null
+          hunt_id?: string
+          id?: string
+          intro_scene_1?: string | null
+          intro_scene_2?: string | null
+          intro_scene_3?: string | null
+          theme?: string | null
+          tone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hunt_stories_hunt_id_fkey"
+            columns: ["hunt_id"]
+            isOneToOne: true
+            referencedRelation: "hunts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hunts: {
         Row: {
           base_ticket_price: number
@@ -238,6 +288,101 @@ export type Database = {
             columns: ["hunt_id"]
             isOneToOne: false
             referencedRelation: "hunts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_story_options: {
+        Row: {
+          created_at: string
+          hint_1: string | null
+          hint_2: string | null
+          id: string
+          is_selected: boolean | null
+          location_stop_id: string
+          madlib_word: string
+          option_number: number
+          riddle_answer: string
+          riddle_text: string
+          story_text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hint_1?: string | null
+          hint_2?: string | null
+          id?: string
+          is_selected?: boolean | null
+          location_stop_id: string
+          madlib_word: string
+          option_number: number
+          riddle_answer: string
+          riddle_text: string
+          story_text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hint_1?: string | null
+          hint_2?: string | null
+          id?: string
+          is_selected?: boolean | null
+          location_stop_id?: string
+          madlib_word?: string
+          option_number?: number
+          riddle_answer?: string
+          riddle_text?: string
+          story_text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_story_options_location_stop_id_fkey"
+            columns: ["location_stop_id"]
+            isOneToOne: false
+            referencedRelation: "location_stops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      madlib_blank_fills: {
+        Row: {
+          created_at: string
+          hunt_id: string
+          id: string
+          location_stop_id: string
+          updated_at: string
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          hunt_id: string
+          id?: string
+          location_stop_id: string
+          updated_at?: string
+          word: string
+        }
+        Update: {
+          created_at?: string
+          hunt_id?: string
+          id?: string
+          location_stop_id?: string
+          updated_at?: string
+          word?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "madlib_blank_fills_hunt_id_fkey"
+            columns: ["hunt_id"]
+            isOneToOne: false
+            referencedRelation: "hunts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "madlib_blank_fills_location_stop_id_fkey"
+            columns: ["location_stop_id"]
+            isOneToOne: false
+            referencedRelation: "location_stops"
             referencedColumns: ["id"]
           },
         ]
