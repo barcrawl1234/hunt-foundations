@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+# HuntQuest - Story-Driven Bar Crawl Platform
 
-## Project info
+A digital treasure hunt and escape room platform for creating and playing immersive bar crawl adventures.
 
-**URL**: https://lovable.dev/projects/2b442d73-ad84-457c-88ef-b9bd04054337
+## Overview
 
-## How can I edit this code?
+HuntQuest enables hosts to create themed, story-driven bar crawl experiences while players solve puzzles and explore cities through interactive adventures.
 
-There are several ways of editing your application.
+## User Roles
 
-**Use Lovable**
+- **PLAYER**: Participate in hunts, solve puzzles, and explore bar crawls
+- **HOST**: Create and manage hunts, set pricing, track analytics
+- **SUPER_ADMIN**: Platform-wide management and oversight
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2b442d73-ad84-457c-88ef-b9bd04054337) and start prompting.
+## Quick Start
 
-Changes made via Lovable will be committed automatically to this repo.
+```bash
+# Install dependencies
+npm install
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## Technology Stack
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- Lovable Cloud (Supabase) for backend
+- PWA-ready for mobile installation
 
-**Use GitHub Codespaces**
+## Features
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Email/password authentication with role-based access
+- Mobile-first, responsive design
+- Complete data model for hunts, puzzles, and player progress
+- PWA capabilities for native-like mobile experience
+- Secure Row Level Security policies
 
-## What technologies are used for this project?
+## Project Structure
 
-This project is built with:
+```
+src/
+├── components/        # Reusable UI components
+│   ├── layout/       # Navigation and layout components
+│   └── ui/           # shadcn/ui components
+├── lib/              # Utilities and auth logic
+├── pages/            # Route pages
+│   ├── player/       # Player dashboard
+│   ├── host/         # Host dashboard
+│   └── admin/        # Super admin panel
+└── integrations/     # Lovable Cloud integration
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Documentation
 
-## How can I deploy this project?
+- [DATA_MODEL.md](./DATA_MODEL.md) - Complete database schema
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - System architecture overview
 
-Simply open [Lovable](https://lovable.dev/projects/2b442d73-ad84-457c-88ef-b9bd04054337) and click on Share -> Publish.
+## Next Steps
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Future features will include:
+- Hunt builder interface
+- QR code generation and scanning
+- AI-powered story generation
+- Payment processing
+- Real-time multiplayer
+- Analytics dashboard
