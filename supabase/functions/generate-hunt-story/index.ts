@@ -27,47 +27,91 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Build the AI prompt
-    const systemPrompt = `You are a creative storytelling AI that generates immersive treasure hunt narratives for bar crawls. Create engaging, themed stories with riddles that incorporate real location names.
+    const systemPrompt = `You are a master storyteller creating immersive bar crawl mystery narratives. Your stories must be coherent, adult-appropriate, and work like interactive mad-lib mysteries.
+
+CORE RULES:
+1. Each hunt has ONE unified story/mystery arc
+2. The final story is a mad-lib with blanks like {{BLANK_1}}, {{BLANK_2}}, etc.
+3. Each bar corresponds to exactly ONE blank in the final story
+4. The riddle answer IS the word that fills the blank (NOT the bar name, NOT a random word)
+5. Riddle answers must be story-relevant objects, clues, phrases, or concepts
+6. Story beats, riddles, and answers must form a logical chain
 
 Your output must be valid JSON matching this exact structure:
 {
   "intro_scenes": ["scene 1", "scene 2", "scene 3"],
-  "final_madlib_template": "Template with ____ blanks",
+  "final_template": "A narrative with {{BLANK_1}}, {{BLANK_2}}, etc. placeholders",
+  "blank_definitions": [
+    {
+      "key": "BLANK_1",
+      "description": "What type of thing fills this blank"
+    }
+  ],
   "locations": [
     {
       "location_id": "uuid",
+      "location_name": "Bar Name",
       "options": [
         {
-          "story_text": "Scene at this location",
-          "riddle_text": "A riddle about the location",
-          "riddle_answer": "answer",
-          "hint_1": "first hint",
-          "hint_2": "second hint",
-          "madlib_word": "word for blank"
+          "story_text": "2-4 sentences of immersive narrative at this specific bar",
+          "riddle_text": "A riddle that grows from the story beat",
+          "riddle_answer": "The exact word/phrase that fills the blank AND answers the riddle",
+          "blank_key": "BLANK_1",
+          "hint_1": "Weak hint",
+          "hint_2": "Medium hint",
+          "hint_3": "Strong hint"
         }
       ]
     }
   ]
 }`;
 
-    const userPrompt = `Create a ${theme} themed treasure hunt story with a ${tone} tone (${ageRating} rating).
+    const userPrompt = `Create a ${theme} themed mystery for a bar crawl with ${tone} tone (${ageRating} rating).
 
-${customNotes ? `Custom requirements: ${customNotes}` : ''}
+${customNotes ? `Story requirements: ${customNotes}` : ''}
 
 Locations (in order):
 ${locations.map((loc: any, i: number) => `${i + 1}. ${loc.name} (ID: ${loc.id})`).join('\n')}
 
-Generate:
-1. THREE different intro scenes that set the mood and story
-2. A mad-lib style final template with ${locations.length} blanks (use ____ for each blank)
-3. For EACH location, create THREE distinct options, each with:
-   - A story moment specific to that location
-   - A riddle tied to the theme and location name
-   - The riddle answer
-   - Two helpful hints
-   - A single word that will fill one blank in the final mad-lib
+GENERATE:
 
-Make each option unique and creative. Return ONLY valid JSON.`;
+1. THREE intro scenes (each 2-3 sentences) that establish the mystery's atmosphere and hook
+
+2. A FINAL STORY TEMPLATE (2-4 paragraphs):
+   - Must contain exactly ${locations.length} blanks: {{BLANK_1}}, {{BLANK_2}}, etc.
+   - Write it as a complete narrative that reveals the mystery's conclusion
+   - The blanks should be key story elements (objects, places, actions, names)
+
+3. BLANK DEFINITIONS for each blank:
+   - Describe what type of answer belongs in each blank
+   - Example: "BLANK_1: A stolen object from the first bar"
+
+4. For EACH of the ${locations.length} locations, create THREE distinct options:
+   
+   For each option:
+   - story_text: 2-4 immersive sentences at "${locations[0]?.name}" (use actual bar name)
+     - Advance the core mystery at this location
+     - Reference specific details about the scene
+   - riddle_text: A puzzle that emerges from the story_text
+     - Should reference objects/characters/details from the scene
+     - NOT just asking for the bar's name
+   - riddle_answer: A single word or short phrase that:
+     - Solves the riddle
+     - Fits one of your blank definitions
+     - Will be inserted into the final story as {{BLANK_X}}
+     - Is NOT the bar name (unless absolutely necessary)
+     - Is a meaningful story element (object, clue, phrase, concept)
+   - blank_key: Which blank this answer fills (e.g., "BLANK_1")
+   - hint_1, hint_2, hint_3: Three progressive hints based on the story and riddle
+
+CRITICAL:
+- The riddle_answer IS the madlib word (do not generate separate words)
+- Each location's options must map to a different blank
+- Riddle answers should feel important to the mystery, not random
+- Story beats must reference the actual bar names
+- All three options per location should offer different riddle answers for variety
+
+Return ONLY valid JSON.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -128,7 +172,7 @@ Make each option unique and creative. Return ONLY valid JSON.`;
         intro_scene_1: storyData.intro_scenes[0],
         intro_scene_2: storyData.intro_scenes[1],
         intro_scene_3: storyData.intro_scenes[2],
-        final_madlib_template: storyData.final_madlib_template,
+        final_madlib_template: storyData.final_template || storyData.final_madlib_template,
         tone: tone,
         theme: theme,
       }, {
@@ -167,8 +211,8 @@ Make each option unique and creative. Return ONLY valid JSON.`;
             riddle_text: option.riddle_text,
             riddle_answer: option.riddle_answer,
             hint_1: option.hint_1,
-            hint_2: option.hint_2,
-            madlib_word: option.madlib_word,
+            hint_2: option.hint_2 || option.hint_2,
+            madlib_word: option.riddle_answer, // The riddle answer IS the madlib word
             is_selected: false,
           });
 
