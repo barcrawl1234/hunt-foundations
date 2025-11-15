@@ -120,7 +120,7 @@ Make each option unique and creative. Return ONLY valid JSON.`;
       throw new Error('Invalid AI response format');
     }
 
-    // Save to database
+    // Save to database - upsert on hunt_id to update existing stories
     const { data: huntStory, error: storyError } = await supabase
       .from('hunt_stories')
       .upsert({
@@ -131,6 +131,8 @@ Make each option unique and creative. Return ONLY valid JSON.`;
         final_madlib_template: storyData.final_madlib_template,
         tone: tone,
         theme: theme,
+      }, {
+        onConflict: 'hunt_id'
       })
       .select()
       .single();
@@ -140,13 +142,25 @@ Make each option unique and creative. Return ONLY valid JSON.`;
       throw storyError;
     }
 
-    // Save location story options
+    // Delete existing location story options for this hunt's locations before inserting new ones
+    const locationIds = storyData.locations.map((loc: any) => loc.location_id);
+    const { error: deleteError } = await supabase
+      .from('location_story_options')
+      .delete()
+      .in('location_stop_id', locationIds);
+
+    if (deleteError) {
+      console.error('Error deleting old location story options:', deleteError);
+      throw deleteError;
+    }
+
+    // Save new location story options
     for (const locationData of storyData.locations) {
       for (let i = 0; i < locationData.options.length; i++) {
         const option = locationData.options[i];
         const { error: optionError } = await supabase
           .from('location_story_options')
-          .upsert({
+          .insert({
             location_stop_id: locationData.location_id,
             option_number: i + 1,
             story_text: option.story_text,
