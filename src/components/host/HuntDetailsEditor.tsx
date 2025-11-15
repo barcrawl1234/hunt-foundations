@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,6 +18,8 @@ export const HuntDetailsEditor = ({ huntId, hunt, onUpdate }: HuntDetailsEditorP
   const [title, setTitle] = useState(hunt.title);
   const [description, setDescription] = useState(hunt.description || '');
   const [city, setCity] = useState(hunt.city || '');
+  const [playOrder, setPlayOrder] = useState(hunt.play_order || 'FLEXIBLE');
+  const [finalStopMode, setFinalStopMode] = useState(hunt.final_stop_mode || 'HAS_FINAL_STOP');
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -29,6 +32,8 @@ export const HuntDetailsEditor = ({ huntId, hunt, onUpdate }: HuntDetailsEditorP
           title,
           description,
           city,
+          play_order: playOrder,
+          final_stop_mode: finalStopMode,
         })
         .eq('id', huntId);
 
@@ -86,6 +91,32 @@ export const HuntDetailsEditor = ({ huntId, hunt, onUpdate }: HuntDetailsEditorP
             onChange={(e) => setCity(e.target.value)}
             placeholder="Enter city name"
           />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="play-order">Play Order</Label>
+          <Select value={playOrder} onValueChange={setPlayOrder}>
+            <SelectTrigger id="play-order">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="FLEXIBLE">Flexible - players choose their own route</SelectItem>
+              <SelectItem value="LINEAR">Linear - players must follow a fixed sequence</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="final-stop">Final Stop</Label>
+          <Select value={finalStopMode} onValueChange={setFinalStopMode}>
+            <SelectTrigger id="final-stop">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="HAS_FINAL_STOP">Has final stop - one location is the grand finale</SelectItem>
+              <SelectItem value="NO_FINAL_STOP">No final stop - all locations are equal</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Button onClick={handleSave} disabled={saving}>

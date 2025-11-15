@@ -35,6 +35,15 @@ export const HuntStoryGenerator = ({ huntId, onGenerated }: HuntStoryGeneratorPr
     setIsGenerating(true);
 
     try {
+      // Fetch hunt settings
+      const { data: hunt, error: huntError } = await supabase
+        .from('hunts')
+        .select('play_order, final_stop_mode')
+        .eq('id', huntId)
+        .single();
+
+      if (huntError) throw huntError;
+
       // Fetch location stops for this hunt
       const { data: locations, error: locError } = await supabase
         .from('location_stops')
@@ -62,6 +71,8 @@ export const HuntStoryGenerator = ({ huntId, onGenerated }: HuntStoryGeneratorPr
           ageRating,
           customNotes,
           locations,
+          playOrder: hunt.play_order,
+          finalStopMode: hunt.final_stop_mode,
         },
       });
 
