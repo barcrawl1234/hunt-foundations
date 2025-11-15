@@ -161,9 +161,13 @@ export type Database = {
           created_at: string
           description: string | null
           estimated_duration_minutes: number | null
+          final_stop_mode:
+            | Database["public"]["Enums"]["final_stop_mode_type"]
+            | null
           host_id: string
           id: string
           is_public: boolean
+          play_order: Database["public"]["Enums"]["play_order_type"] | null
           start_mode: Database["public"]["Enums"]["hunt_start_mode"]
           status: Database["public"]["Enums"]["hunt_status"]
           theme: string | null
@@ -176,9 +180,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           estimated_duration_minutes?: number | null
+          final_stop_mode?:
+            | Database["public"]["Enums"]["final_stop_mode_type"]
+            | null
           host_id: string
           id?: string
           is_public?: boolean
+          play_order?: Database["public"]["Enums"]["play_order_type"] | null
           start_mode?: Database["public"]["Enums"]["hunt_start_mode"]
           status?: Database["public"]["Enums"]["hunt_status"]
           theme?: string | null
@@ -191,9 +199,13 @@ export type Database = {
           created_at?: string
           description?: string | null
           estimated_duration_minutes?: number | null
+          final_stop_mode?:
+            | Database["public"]["Enums"]["final_stop_mode_type"]
+            | null
           host_id?: string
           id?: string
           is_public?: boolean
+          play_order?: Database["public"]["Enums"]["play_order_type"] | null
           start_mode?: Database["public"]["Enums"]["hunt_start_mode"]
           status?: Database["public"]["Enums"]["hunt_status"]
           theme?: string | null
@@ -294,9 +306,11 @@ export type Database = {
       }
       location_story_options: {
         Row: {
+          blank_key: string | null
           created_at: string
           hint_1: string | null
           hint_2: string | null
+          hint_3: string | null
           id: string
           is_selected: boolean | null
           location_stop_id: string
@@ -308,9 +322,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          blank_key?: string | null
           created_at?: string
           hint_1?: string | null
           hint_2?: string | null
+          hint_3?: string | null
           id?: string
           is_selected?: boolean | null
           location_stop_id: string
@@ -322,9 +338,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          blank_key?: string | null
           created_at?: string
           hint_1?: string | null
           hint_2?: string | null
+          hint_3?: string | null
           id?: string
           is_selected?: boolean | null
           location_stop_id?: string
@@ -800,10 +818,12 @@ export type Database = {
     Enums: {
       app_role: "PLAYER" | "HOST" | "SUPER_ADMIN"
       clue_difficulty: "EASY" | "MEDIUM" | "HARD"
+      final_stop_mode_type: "NO_FINAL_STOP" | "HAS_FINAL_STOP"
       hunt_start_mode: "FIXED_START" | "FLEXIBLE_START"
       hunt_status: "DRAFT" | "PUBLISHED" | "ARCHIVED"
       payment_status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED"
       payment_type: "TICKET" | "UPSELL" | "SPONSORSHIP"
+      play_order_type: "FLEXIBLE" | "LINEAR"
       puzzle_type:
         | "RIDDLE"
         | "LOGIC"
@@ -941,10 +961,12 @@ export const Constants = {
     Enums: {
       app_role: ["PLAYER", "HOST", "SUPER_ADMIN"],
       clue_difficulty: ["EASY", "MEDIUM", "HARD"],
+      final_stop_mode_type: ["NO_FINAL_STOP", "HAS_FINAL_STOP"],
       hunt_start_mode: ["FIXED_START", "FLEXIBLE_START"],
       hunt_status: ["DRAFT", "PUBLISHED", "ARCHIVED"],
       payment_status: ["PENDING", "COMPLETED", "FAILED", "REFUNDED"],
       payment_type: ["TICKET", "UPSELL", "SPONSORSHIP"],
+      play_order_type: ["FLEXIBLE", "LINEAR"],
       puzzle_type: [
         "RIDDLE",
         "LOGIC",

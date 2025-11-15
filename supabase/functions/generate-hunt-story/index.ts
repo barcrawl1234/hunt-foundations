@@ -12,9 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const { huntId, theme, tone, ageRating, customNotes, locations } = await req.json();
+    const { huntId, theme, tone, ageRating, customNotes, locations, playOrder, finalStopMode } = await req.json();
 
-    console.log('Generating hunt story for:', { huntId, theme, tone, ageRating });
+    console.log('Generating hunt story for:', { huntId, theme, tone, ageRating, playOrder, finalStopMode });
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -27,7 +27,18 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Build the AI prompt
-    const systemPrompt = `You are a master storyteller creating immersive bar crawl mystery narratives. Your stories must be coherent, adult-appropriate, and work like interactive mad-lib mysteries.
+    const orderInstructions = playOrder === 'FLEXIBLE' 
+      ? `CRITICAL: Players can visit locations in ANY order they choose.
+         - Do NOT write story text that assumes a fixed sequence ("first go to X", "next visit Y", "your second stop").
+         - Do NOT number locations as "Stop 1", "Stop 2", etc.
+         - Each location's story beat should describe what happens WHEN they are there, not imply an order.
+         - The intro scenes set up the mystery but do NOT dictate a route.
+         - The final story should reference what was discovered across the bars without assuming the order visited.`
+      : `Players must follow locations in the exact order provided.`;
+
+    const systemPrompt = `You are a master storyteller creating immersive, adult-appropriate bar crawl mystery narratives. Your stories must be coherent and work like interactive mad-lib mysteries.
+
+${orderInstructions}
 
 CORE RULES:
 1. Each hunt has ONE unified story/mystery arc
@@ -36,6 +47,14 @@ CORE RULES:
 4. The riddle answer IS the word that fills the blank (NOT the bar name, NOT a random word)
 5. Riddle answers must be story-relevant objects, clues, phrases, or concepts
 6. Story beats, riddles, and answers must form a logical chain
+7. You MUST generate EXACTLY 3 options per location - no exceptions
+
+TONE & STYLE:
+- This is for adults - be witty, sarcastic, punchy
+- Can reference drinking, bad decisions, party chaos
+- Match the requested theme and tone
+- NO generic "Hallmark movie" text
+- Make it fun and memorable
 
 Your output must be valid JSON matching this exact structure:
 {
@@ -57,6 +76,24 @@ Your output must be valid JSON matching this exact structure:
           "riddle_text": "A riddle that grows from the story beat",
           "riddle_answer": "The exact word/phrase that fills the blank AND answers the riddle",
           "blank_key": "BLANK_1",
+          "hint_1": "Weak hint",
+          "hint_2": "Medium hint",
+          "hint_3": "Strong hint"
+        },
+        {
+          "story_text": "Alternative scenario at this bar",
+          "riddle_text": "Different riddle for this location",
+          "riddle_answer": "Different answer for same or different blank",
+          "blank_key": "BLANK_1 or BLANK_2",
+          "hint_1": "Weak hint",
+          "hint_2": "Medium hint",
+          "hint_3": "Strong hint"
+        },
+        {
+          "story_text": "Third option at this bar",
+          "riddle_text": "Third riddle variant",
+          "riddle_answer": "Third possible answer",
+          "blank_key": "BLANK_1, BLANK_2, or BLANK_3",
           "hint_1": "Weak hint",
           "hint_2": "Medium hint",
           "hint_3": "Strong hint"
@@ -198,6 +235,14 @@ Return ONLY valid JSON.`;
       throw deleteError;
     }
 
+    // Validate that we have exactly 3 options per location
+    for (const locationData of storyData.locations) {
+      if (!locationData.options || locationData.options.length !== 3) {
+        console.error(`Location ${locationData.location_name} has ${locationData.options?.length || 0} options instead of 3`);
+        throw new Error(`AI must generate exactly 3 options per location. ${locationData.location_name} only has ${locationData.options?.length || 0}.`);
+      }
+    }
+
     // Save new location story options
     for (const locationData of storyData.locations) {
       for (let i = 0; i < locationData.options.length; i++) {
@@ -211,8 +256,10 @@ Return ONLY valid JSON.`;
             riddle_text: option.riddle_text,
             riddle_answer: option.riddle_answer,
             hint_1: option.hint_1,
-            hint_2: option.hint_2 || option.hint_2,
+            hint_2: option.hint_2,
+            hint_3: option.hint_3,
             madlib_word: option.riddle_answer, // The riddle answer IS the madlib word
+            blank_key: option.blank_key,
             is_selected: false,
           });
 
