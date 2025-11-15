@@ -7,7 +7,8 @@ import { AuthProvider } from "@/lib/auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import PlayerDashboard from "./pages/player/PlayerDashboard";
-import HostDashboard from "./pages/host/HostDashboard";
+import HuntList from "./pages/host/HuntList";
+import HuntEditor from "./pages/host/HuntEditor";
 import SuperAdminDashboard from "./pages/admin/SuperAdminDashboard";
 import NotFound from "./pages/NotFound";
 
@@ -24,7 +25,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/player/dashboard" element={<PlayerDashboard />} />
-            <Route path="/host/dashboard" element={<HostDashboard />} />
+            <Route path="/host/dashboard" element={<HuntList />} />
+            <Route path="/host/hunt/:huntId" element={<HuntEditor />} />
             <Route path="/admin/super" element={<SuperAdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
