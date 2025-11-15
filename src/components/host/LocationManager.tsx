@@ -73,6 +73,13 @@ export const LocationManager = ({ huntId }: LocationManagerProps) => {
   };
 
   const updateLocation = async (id: string, field: string, value: string) => {
+    // Update local state immediately for responsive UI
+    setLocations(prev => 
+      prev.map(loc => 
+        loc.id === id ? { ...loc, [field]: value } : loc
+      )
+    );
+
     try {
       const { error } = await supabase
         .from('location_stops')
@@ -86,6 +93,8 @@ export const LocationManager = ({ huntId }: LocationManagerProps) => {
         description: error.message,
         variant: "destructive",
       });
+      // Reload on error to sync with database
+      loadLocations();
     }
   };
 
