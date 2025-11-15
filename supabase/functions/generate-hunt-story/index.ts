@@ -194,7 +194,12 @@ Return ONLY valid JSON.`;
     try {
       // Extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || content.match(/```\n([\s\S]*?)\n```/);
-      const jsonStr = jsonMatch ? jsonMatch[1] : content;
+      let jsonStr = jsonMatch ? jsonMatch[1] : content;
+      
+      // Clean up common JSON formatting issues from AI
+      // Remove trailing commas before closing braces/brackets
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+      
       storyData = JSON.parse(jsonStr);
     } catch (e) {
       console.error('Failed to parse AI response:', e);
